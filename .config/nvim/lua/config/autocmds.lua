@@ -1,3 +1,2 @@
 -- Autocmds are automatically loaded on the VeryLazy event
--- Default autocmds that are always set: https://github.com/Rvim/Rvim/blob/main/lua/rvim/config/autocmds.lua
 -- Add any additional autocmds here

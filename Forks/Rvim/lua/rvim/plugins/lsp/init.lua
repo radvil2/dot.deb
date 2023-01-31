@@ -4,10 +4,21 @@ return {
     "neovim/nvim-lspconfig",
     event = "BufReadPre",
     dependencies = {
-      { "folke/neoconf.nvim", cmd = "Neoconf", config = true },
-      { "folke/neodev.nvim", opts = { experimental = { pathStrict = true } } },
       "mason.nvim",
       "williamboman/mason-lspconfig.nvim",
+      {
+        "folke/neoconf.nvim",
+        cmd = "Neoconf",
+        config = true,
+      },
+      {
+        "folke/neodev.nvim",
+        opts = {
+          experimental = {
+            pathStrict = true,
+          },
+        },
+      },
       {
         "hrsh7th/cmp-nvim-lsp",
         cond = function()
@@ -21,7 +32,10 @@ return {
       diagnostics = {
         underline = true,
         update_in_insert = false,
-        virtual_text = { spacing = 4, prefix = "●" },
+        virtual_text = {
+          spacing = 4,
+          prefix = "●",
+        },
         severity_sort = true,
       },
       -- Automatically format on save
@@ -52,8 +66,11 @@ return {
         },
       },
       -- you can do any additional lsp server setup here
+
       -- return true if you don't want this server to be setup with lspconfig
+
       ---@type table<string, fun(server:string, opts:_.lspconfig.options):boolean?>
+
       setup = {
         -- example to setup with typescript.nvim
         -- tsserver = function(_, opts)
@@ -65,13 +82,14 @@ return {
       },
     },
     ---@param opts PluginLspOpts
-    config = function(plugin, opts)
+    config = function(_, opts)
       -- setup autoformat
-      require("rvim.plugins.lsp.format").autoformat = opts.autoformat
+      require("rvim.plugins.lsp.common.formatter").autoformat = opts.autoformat
+
       -- setup formatting and keymaps
       require("rvim.util").on_attach(function(client, buffer)
-        require("rvim.plugins.lsp.format").on_attach(client, buffer)
-        require("rvim.plugins.lsp.keymaps").on_attach(client, buffer)
+        require("rvim.plugins.lsp.common.formatter").on_attach(client, buffer)
+        require("rvim.plugins.lsp.common.keymapper").on_attach(client, buffer)
       end)
 
       -- diagnostics
@@ -120,8 +138,9 @@ return {
     end,
   },
 
-  -- formatters
+  -- Linters & Formatters
   {
+
     "jose-elias-alvarez/null-ls.nvim",
     event = "BufReadPre",
     dependencies = { "mason.nvim" },
@@ -129,7 +148,7 @@ return {
       local nls = require("null-ls")
       return {
         sources = {
-          -- nls.builtins.formatting.prettierd,
+          nls.builtins.formatting.prettierd,
           nls.builtins.formatting.stylua,
           nls.builtins.diagnostics.flake8,
         },
@@ -137,7 +156,7 @@ return {
     end,
   },
 
-  -- cmdline tools and lsp servers
+  -- Cmdline tools and lsp servers
   {
 
     "williamboman/mason.nvim",
@@ -151,8 +170,9 @@ return {
         "flake8",
       },
     },
+
     ---@param opts MasonSettings | {ensure_installed: string[]}
-    config = function(plugin, opts)
+    config = function(_, opts)
       require("mason").setup(opts)
       local mr = require("mason-registry")
       for _, tool in ipairs(opts.ensure_installed) do

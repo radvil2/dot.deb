@@ -1,5 +1,11 @@
 return {
-  -- Better `vim.notify()`
+  -- icons
+  { "nvim-tree/nvim-web-devicons", lazy = true },
+
+  -- ui components
+  { "MunifTanjim/nui.nvim", lazy = true },
+
+  -- better notifier
   {
     "rcarriga/nvim-notify",
     keys = {
@@ -29,18 +35,26 @@ return {
     init = function()
       ---@diagnostic disable-next-line: duplicate-set-field
       vim.ui.select = function(...)
-        require("lazy").load({ plugins = { "dressing.nvim" } })
+        require("lazy").load({
+          plugins = {
+            "dressing.nvim",
+          },
+        })
         return vim.ui.select(...)
       end
       ---@diagnostic disable-next-line: duplicate-set-field
       vim.ui.input = function(...)
-        require("lazy").load({ plugins = { "dressing.nvim" } })
+        require("lazy").load({
+          plugins = {
+            "dressing.nvim",
+          },
+        })
         return vim.ui.input(...)
       end
     end,
   },
 
-  -- bufferline
+  -- Bufferline
   {
     "akinsho/bufferline.nvim",
     event = "VeryLazy",
@@ -48,16 +62,22 @@ return {
       options = {
         diagnostics = "nvim_lsp",
         always_show_bufferline = false,
-        diagnostics_indicator = function(_, _, diag)
-          local icons = require("rvim.config").icons.diagnostics
-          local ret = (diag.error and icons.Error .. diag.error .. " " or "")
-            .. (diag.warning and icons.Warn .. diag.warning or "")
-          return vim.trim(ret)
-        end,
+        show_close_icon = false,
+        separator_style = "slant",
+        hover = {
+          enabled = true,
+          delay = 200,
+          reveal = {
+            "close",
+          },
+        },
+        indicator = {
+          style = "icon",
+        },
         offsets = {
           {
             filetype = "neo-tree",
-            text = "Neo-tree",
+            text = "🌲 NeoTree",
             highlight = "Directory",
             text_align = "left",
           },
@@ -66,11 +86,11 @@ return {
     },
   },
 
-  -- statusline
+  -- Statusline
   {
     "nvim-lualine/lualine.nvim",
     event = "VeryLazy",
-    opts = function(plugin)
+    opts = function(_)
       local icons = require("rvim.config").icons
 
       local function fg(name)
@@ -85,10 +105,18 @@ return {
         options = {
           theme = "auto",
           globalstatus = true,
-          disabled_filetypes = { statusline = { "dashboard", "lazy", "alpha" } },
+          disabled_filetypes = {
+            statusline = {
+              "dashboard",
+              "alpha",
+              "lazy",
+            },
+          },
         },
         sections = {
-          lualine_a = { "mode" },
+          lualine_a = {
+            "mode",
+          },
           lualine_b = { "branch" },
           lualine_c = {
             {
@@ -100,28 +128,57 @@ return {
                 hint = icons.diagnostics.Hint,
               },
             },
-            { "filetype", icon_only = true, separator = "", padding = { left = 1, right = 0 } },
-            { "filename", path = 1, symbols = { modified = "  ", readonly = "", unnamed = "" } },
-            -- stylua: ignore
             {
-              function() return require("nvim-navic").get_location() end,
-              cond = function() return package.loaded["nvim-navic"] and require("nvim-navic").is_available() end,
+              "filetype",
+              icon_only = true,
+              separator = "",
+              padding = {
+                left = 1,
+                right = 0,
+              },
+            },
+            {
+              "filename",
+              path = 1,
+              symbols = {
+                modified = "  ",
+                readonly = "",
+                unnamed = "",
+              },
+            },
+            {
+              function()
+                return require("nvim-navic").get_location()
+              end,
+              cond = function()
+                return package.loaded["nvim-navic"] and require("nvim-navic").is_available()
+              end,
             },
           },
           lualine_x = {
-            -- stylua: ignore
             {
-              function() return require("noice").api.status.command.get() end,
-              cond = function() return package.loaded["noice"] and require("noice").api.status.command.has() end,
-              color = fg("Statement")
+              function()
+                return require("noice").api.status.command.get()
+              end,
+              cond = function()
+                return package.loaded["noice"] and require("noice").api.status.command.has()
+              end,
+              color = fg("Statement"),
             },
-            -- stylua: ignore
             {
-              function() return require("noice").api.status.mode.get() end,
-              cond = function() return package.loaded["noice"] and require("noice").api.status.mode.has() end,
-              color = fg("Constant") ,
+              function()
+                return require("noice").api.status.mode.get()
+              end,
+              cond = function()
+                return package.loaded["noice"] and require("noice").api.status.mode.has()
+              end,
+              color = fg("Constant"),
             },
-            { require("lazy.status").updates, cond = require("lazy.status").has_updates, color = fg("Special") },
+            {
+              require("lazy.status").updates,
+              cond = require("lazy.status").has_updates,
+              color = fg("Special"),
+            },
             {
               "diff",
               symbols = {
@@ -151,7 +208,6 @@ return {
     "lukas-reineke/indent-blankline.nvim",
     event = "BufReadPost",
     opts = {
-      -- char = "▏",
       char = "│",
       filetype_exclude = { "help", "alpha", "dashboard", "neo-tree", "Trouble", "lazy" },
       show_trailing_blankline_indent = false,
@@ -165,7 +221,6 @@ return {
     version = false, -- wait till new 0.7.0 release to put it back on semver
     event = "BufReadPre",
     opts = {
-      -- symbol = "▏",
       symbol = "│",
       options = { try_as_border = true },
     },
@@ -197,14 +252,58 @@ return {
         long_message_to_split = true,
       },
     },
-    -- stylua: ignore
     keys = {
-      { "<S-Enter>", function() require("noice").redirect(vim.fn.getcmdline()) end, mode = "c", desc = "Redirect Cmdline" },
-      { "<leader>snl", function() require("noice").cmd("last") end, desc = "Noice Last Message" },
-      { "<leader>snh", function() require("noice").cmd("history") end, desc = "Noice History" },
-      { "<leader>sna", function() require("noice").cmd("all") end, desc = "Noice All" },
-      { "<c-f>", function() if not require("noice.lsp").scroll(4) then return "<c-f>" end end, silent = true, expr = true, desc = "Scroll forward" },
-      { "<c-b>", function() if not require("noice.lsp").scroll(-4) then return "<c-b>" end end, silent = true, expr = true, desc = "Scroll backward"},
+      {
+        "<S-Enter>",
+        function()
+          require("noice").redirect(vim.fn.getcmdline())
+        end,
+        mode = "c",
+        desc = "Redirect Cmdline",
+      },
+      {
+        "<leader>snl",
+        function()
+          require("noice").cmd("last")
+        end,
+        desc = "Noice Last Message",
+      },
+      {
+        "<leader>snh",
+        function()
+          require("noice").cmd("history")
+        end,
+        desc = "Noice History",
+      },
+      {
+        "<leader>sna",
+        function()
+          require("noice").cmd("all")
+        end,
+        desc = "Noice All",
+      },
+      {
+        "<c-f>",
+        function()
+          if not require("noice.lsp").scroll(4) then
+            return "<c-f>"
+          end
+        end,
+        silent = true,
+        expr = true,
+        desc = "Scroll forward",
+      },
+      {
+        "<c-b>",
+        function()
+          if not require("noice.lsp").scroll(-4) then
+            return "<c-b>"
+          end
+        end,
+        silent = true,
+        expr = true,
+        desc = "Scroll backward",
+      },
     },
   },
 
@@ -284,12 +383,10 @@ return {
         end
       end)
     end,
-    opts = { separator = " ", highlight = true, depth_limit = 5 },
+    opts = {
+      separator = " ",
+      highlight = true,
+      depth_limit = 5,
+    },
   },
-
-  -- icons
-  { "nvim-tree/nvim-web-devicons", lazy = true },
-
-  -- ui components
-  { "MunifTanjim/nui.nvim", lazy = true },
 }

@@ -5,7 +5,7 @@ M._keys = nil
 
 ---@return (LazyKeys|{has?:string})[]
 function M.get()
-  local format = require("rvim.plugins.lsp.format").format
+  local format = require("rvim.plugins.lsp.common.formatter").format
   ---@class PluginLspKeys
   M._keys = M._keys
     or {

@@ -1,7 +1,6 @@
 local Util = require("rvim.util")
 
 return {
-
   -- file explorer
   {
     "nvim-neo-tree/neo-tree.nvim",
@@ -59,6 +58,7 @@ return {
     cmd = "Telescope",
     version = false, -- telescope did only one release, so use HEAD for now
     keys = {
+      -- TODO: reset keybindings, extract what is useful!
       { "<leader>,", "<cmd>Telescope buffers show_all_buffers=true<cr>", desc = "Switch Buffer" },
       { "<leader>/", Util.telescope("live_grep"), desc = "Find in Files (Grep)" },
       { "<leader>:", "<cmd>Telescope command_history<cr>", desc = "Command History" },
